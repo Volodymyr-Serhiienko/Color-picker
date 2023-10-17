@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color synthesizer</title>
+    <style>
+        #color-box {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #000;
+        }
+        .color-input {
+            width: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Color synthesizer</h1>
+
+    <!-- Toggle color schema -->
+    <div style="margin: 10px;">
+        <label>
+            <input type="radio" name="colorScheme" value="rgba" checked>RGBA
+        </label>
+        <label>
+            <input type="radio" name="colorScheme" value="hsla">HSLA
+        </label>
+    </div>
+
+    <!-- Color box -->
+    <div style="float: left; margin-right: 10px;" id="color-box"></div>
+
+    <!-- Color inputs -->
+    <div>
+        <label for="redSlider">Red&nbsp;&nbsp;&nbsp;&nbsp;(0-255):</label>
+        <input type="range" id="redSlider" min="0" max="255" value="0">
+        <input type="number" id="redValue" class="color-input" min="0" max="255" step="1" value="0">
+        <br>
+        <label for="greenSlider">Green (0-255):</label>
+        <input type="range" id="greenSlider" min="0" max="255" value="0">
+        <input type="number" id="greenValue" class="color-input" min="0" max="255" step="1" value="0">
+        <br>
+        <label for="blueSlider">Blue&nbsp;&nbsp; (0-255):</label>
+        <input type="range" id="blueSlider" min="0" max="255" value="0">
+        <input type="number" id="blueValue" class="color-input" min="0" max="255" step="1" value="0">
+        <br>
+        <label for="alphaSlider">Alpha&nbsp;&nbsp;&nbsp;&nbsp; (0-1):</label>
+        <input type="range" id="alphaSlider" min="0" max="1" step="0.01" value="1">
+        <input type="number" id="alphaValue" class="color-input" min="0" max="1" step="0.01" value="1">
+    </div>
+
+    <!-- Output result color -->
+    <p id="color-formula"></p>
+    
+    <script>
+        // DOM elements
+        const redLabel = document.querySelector('label[for="redSlider"]');
+        const redSlider = document.getElementById('redSlider');
+        const redValue = document.getElementById('redValue');
+
+        const greenLabel = document.querySelector('label[for="greenSlider"]');
+        const greenSlider = document.getElementById('greenSlider');
+        const greenValue = document.getElementById('greenValue');
+
+        const blueLabel = document.querySelector('label[for="blueSlider"]');
+        const blueSlider = document.getElementById('blueSlider');
+        const blueValue = document.getElementById('blueValue');
+
+        const alphaLabel = document.querySelector('label[for="alphaSlider"]');
+        const alphaSlider = document.getElementById('alphaSlider');
+        const alphaValue = document.getElementById('alphaValue');
+        
+        // Color schema initialize
+        const radioButtons = document.querySelectorAll('input[name="colorScheme"]');
+        var scheme = "rgba";
+        
+        radioButtons.forEach(function(radioButton) {
+            radioButton.addEventListener('change', function() {
+                if(this.value == "rgba"){
+                    scheme = "rgba";
+
+                    redLabel.innerHTML = "Red&nbsp;&nbsp;&nbsp;&nbsp;(0-255):";
+                    redSlider.setAttribute("max", "255");
+                    redSlider.value = 0;
+                    redValue.setAttribute("max", "255");
+                    redValue.value = 0;
+
+                    greenLabel.innerHTML = "Green (0-255):";
+                    greenSlider.setAttribute("max", "255");
+                    greenSlider.value = 0;
+                    greenValue.setAttribute("max", "255");
+                    greenValue.value = 0;
+
+                    blueLabel.innerHTML = "Blue&nbsp;&nbsp; (0-255):";
+                    blueSlider.setAttribute("max", "255");
+                    blueSlider.value = 0;
+                    blueValue.setAttribute("max", "255");
+                    blueValue.value = 0;
+
+                    updateColor();
+                }
+                else{
+                    scheme = "hsla";
+
+                    redLabel.innerHTML = "Hue&nbsp;&nbsp;&nbsp;&nbsp;(0-360):";
+                    redSlider.setAttribute("max", "360");
+                    redSlider.value = 0;
+                    redValue.setAttribute("max", "360");
+                    redValue.value = 0;
+
+                    greenLabel.innerHTML = "Satur&nbsp;&nbsp;(0-100):";
+                    greenSlider.setAttribute("max", "100");
+                    greenSlider.value = 100;
+                    greenValue.setAttribute("max", "100");
+                    greenValue.value = 100;
+
+                    blueLabel.innerHTML = "Light&nbsp;&nbsp;(0-100):";
+                    blueSlider.setAttribute("max", "100");
+                    blueSlider.value = 50;
+                    blueValue.setAttribute("max", "100");
+                    blueValue.value = 50;
+
+                    updateColor();
+                }
+            });
+        });
+
+        //Result elements
+        const colorBox = document.getElementById('color-box');
+        const colorFormula = document.getElementById('color-formula');
+
+        function updateColor() {
+            const red = redSlider.value;
+            const green = greenSlider.value;
+            const blue = blueSlider.value;
+            const alpha = alphaSlider.value;
+            
+            const color = (scheme == "rgba") ? `rgba(${red}, ${green}, ${blue}, ${alpha})` : `hsla(${red}, ${green}%, ${blue}%, ${alpha})`;
+            colorBox.style.backgroundColor = color;
+            colorFormula.textContent = `Result color: ${color}`;
+        }
+
+        function updateSliderFromInput(slider, input) {
+            slider.value = input.value;
+            updateColor();
+        }
+
+        function updateInputFromSlider(input, slider) {
+            input.value = slider.value;
+        }
+
+        redSlider.addEventListener('input', updateColor);
+        redSlider.addEventListener('input', () => updateInputFromSlider(redValue, redSlider));
+        greenSlider.addEventListener('input', updateColor);
+        greenSlider.addEventListener('input', () => updateInputFromSlider(greenValue, greenSlider));
+        blueSlider.addEventListener('input', updateColor);
+        blueSlider.addEventListener('input', () => updateInputFromSlider(blueValue, blueSlider));
+        alphaSlider.addEventListener('input', updateColor);
+        alphaSlider.addEventListener('input', () => updateInputFromSlider(alphaValue, alphaSlider));
+
+        redValue.addEventListener('input', () => updateSliderFromInput(redSlider, redValue));
+        greenValue.addEventListener('input', () => updateSliderFromInput(greenSlider, greenValue));
+        blueValue.addEventListener('input', () => updateSliderFromInput(blueSlider, blueValue));
+        alphaValue.addEventListener('input', () => updateSliderFromInput(alphaSlider, alphaValue));
+        
+        // Initialization
+        updateColor();
+    </script>
+</body>
+</html>
